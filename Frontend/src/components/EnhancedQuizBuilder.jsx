@@ -671,11 +671,9 @@ const EnhancedQuizBuilder = () => {
                 </h3>
                 <p className="text-sm text-gray-600 mt-1">
                   Total Marks: <span className="font-bold text-blue-600">
-                    {quizData.questions.reduce((sum, q) => {
-                      const questionTotal = q.options?.reduce((optSum, opt) => optSum + (opt.marks || 0), 0) || 0;
-                      return sum + questionTotal;
-                    }, 0)}
+                    {quizData.questions.length * 10}
                   </span>
+                  <span className="text-xs text-gray-500 ml-2">(Each question = 10 marks)</span>
                 </p>
               </div>
               <button

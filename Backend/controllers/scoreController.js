@@ -56,8 +56,8 @@ export const getAllScores = async (req, res) => {
       const student = userMap[score.student?.toString()] || {};
       const quiz = quizMap[score.quiz?.toString()] || {};
       
-      // Get the Super Admin's defined maxMarks for this quiz
-      const quizMaxMarks = quiz.maxMarks || score.maxMarks || 100;
+      // ✅ FIX: Calculate correct maxMarks = Number of questions × 10
+      const quizMaxMarks = (quiz.questions?.length || 0) * 10 || score.maxMarks || 100;
       
       // Round score to nearest whole number for display
       const roundedScore = Math.round(score.totalScore || 0);
@@ -284,37 +284,19 @@ export const getScoresByQuiz = async (req, res) => {
     // Get users separately
     const userIds = scores.map(s => s.student);
     const users = await User.find({ _id: { $in: userIds }});
-    // Always include Super Admin's quiz.maxMarks and compute a displayScore scaled to that
+    // ✅ FIX: Calculate correct total marks = Number of questions × 10
     const scoresWithMax = scores.map(score => {
       const sObj = score.toObject();
 
-      // Determine quiz max marks (admin-defined) with reasonable fallbacks
-      let quizMax = sObj.quiz?.maxMarks;
-      // 1) Prefer explicit quiz.maxMarks
-      // 2) Else sum of option.points across all questions (matches Super Admin UI 'Total Marks')
-      if ((!quizMax || quizMax <= 0) && Array.isArray(sObj.quiz?.questions)) {
-        const sumOptions = sObj.quiz.questions.reduce((acc, q) => {
-          if (!Array.isArray(q?.options)) return acc;
-          const perQ = q.options.reduce((oa, opt) => {
-            const val = (typeof opt.points === 'number' ? opt.points : (typeof opt.marks === 'number' ? opt.marks : 0));
-            return oa + val;
-          }, 0);
-          return acc + perQ;
-        }, 0);
-        if (sumOptions > 0) quizMax = sumOptions;
+      // Calculate quiz max marks: Number of questions × 10
+      let quizMax = 100; // Default fallback
+      
+      if (Array.isArray(sObj.quiz?.questions) && sObj.quiz.questions.length > 0) {
+        quizMax = sObj.quiz.questions.length * 10;
+      } else if (Array.isArray(sObj.answers) && sObj.answers.length > 0) {
+        // Fallback: use number of answers as question count
+        quizMax = sObj.answers.length * 10;
       }
-      // 3) Else sum of question.maxMarks if defined
-      if ((!quizMax || quizMax <= 0) && Array.isArray(sObj.quiz?.questions)) {
-        const sumQ = sObj.quiz.questions.reduce((acc, q) => acc + (typeof q.maxMarks === 'number' ? q.maxMarks : 0), 0);
-        if (sumQ > 0) quizMax = sumQ;
-      }
-      if (!quizMax && Array.isArray(sObj.answers)) {
-        // Conservative fallback if nothing set: answers.length (MCQ style) or length*10 (ranking default)
-        const hasRanking = sObj.answers.some(a => a.questionType === 'ranking' || typeof a.rankingScore === 'number');
-        quizMax = hasRanking ? sObj.answers.length * 100 /* raw ranking totals are % per Q */ : sObj.answers.length;
-      }
-      // Final guard
-      if (!quizMax || quizMax <= 0) quizMax = sObj.quiz?.maxMarks || 100;
 
       // Compute a displayScore scaled to Super Admin's quizMax
       let displayScore = 0;
@@ -423,19 +405,22 @@ export const getMyScores = async (req, res) => {
       .populate('student', 'fullName email college')
       .sort({ submittedAt: -1 });
 
-    // Use Super Admin's defined maxMarks (not hardcoded!)
+    // ✅ FIX: Calculate correct maxMarks = Number of questions × 10
     const scoresWithCorrectMax = scores.map(score => {
-      const quizMaxMarks = score.quiz?.maxMarks || score.maxMarks || 100;
+      // Calculate based on number of questions
+      const questionsCount = score.quiz?.questions?.length || 0;
+      const quizMaxMarks = questionsCount * 10 || score.maxMarks || 100;
+      
       // Round score to nearest whole number
       const roundedScore = Math.round(score.totalScore || 0);
       return {
         ...score.toObject(),
-        maxMarks: quizMaxMarks, // Use actual quiz maxMarks
+        maxMarks: quizMaxMarks, // Correct calculation: questions × 10
         displayMaxMarks: quizMaxMarks, // For frontend
         displayScore: roundedScore, // Rounded actual score
         quiz: {
           ...score.quiz?.toObject?.() || score.quiz,
-          maxMarks: quizMaxMarks // Use actual quiz maxMarks
+          maxMarks: quizMaxMarks // Correct calculation: questions × 10
         }
       };
     });

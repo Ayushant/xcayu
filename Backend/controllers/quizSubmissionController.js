@@ -48,7 +48,6 @@ export const submitQuiz = async (req, res) => {
   // Process each answer
   const processedAnswers = [];
   let sumPointsEarned = 0; // sum of marks earned across questions
-  let sumMaxPoints = 0;    // sum of max marks across questions
     
     for (let i = 0; i < answers.length; i++) {
       const answer = answers[i];
@@ -60,16 +59,8 @@ export const submitQuiz = async (req, res) => {
       let selectedOptionText = '';
       let selectedOptionImpact = '';
   let points = 0;
-  // Determine per-question max points
-  let maxPoints = question.maxMarks || 10;
-  // For ranking questions, prefer sum of option marks/points as the question's max
-  const optionSum = Array.isArray(question.options)
-    ? question.options.reduce((acc, opt) => acc + (typeof opt.points === 'number' ? opt.points : (typeof opt.marks === 'number' ? opt.marks : 0)), 0)
-    : 0;
-  if ((question.questionType === 'ranking' || !question.questionType) && optionSum > 0) {
-    maxPoints = optionSum;
-  }
-  sumMaxPoints += maxPoints;
+  // ✅ FIX: Each question is worth 10 marks maximum (not sum of all options)
+  let maxPoints = 10;
       let questionType = question.questionType || 'ranking';
       if (questionType === 'ranking' && answer.selectedRanking && Array.isArray(answer.selectedRanking)) {
         // Validate ranking
@@ -93,8 +84,8 @@ export const submitQuiz = async (req, res) => {
         points = selectedOption?.points || selectedOption?.marks || 0;
         sumPointsEarned += points;
         
-        // Calculate max possible points (highest marks among all options)
-        const maxPossiblePoints = Math.max(...question.options.map(opt => opt.points || opt.marks || 0));
+        // ✅ FIX: Each question max is 10 marks (not the sum of all options)
+        const maxPossiblePoints = 10;
         
         // Calculate ranking score as percentage (for display purposes)
         const rankingScore = maxPossiblePoints > 0 ? (points / maxPossiblePoints) * 100 : 0;
@@ -150,30 +141,19 @@ export const submitQuiz = async (req, res) => {
         });
       }
     }
-    // Determine total marks to store using Super Admin decided total
-    // Prefer computed sumMaxPoints (from options) when present, else explicit quiz.maxMarks, else 100
-    let quizTotalMax = sumMaxPoints > 0 ? sumMaxPoints : undefined;
-    if (!quizTotalMax || quizTotalMax <= 0) {
-      if (typeof quiz.maxMarks === 'number' && quiz.maxMarks > 0) {
-        quizTotalMax = quiz.maxMarks;
-      } else {
-        quizTotalMax = 100;
-      }
-    }
-    // If per-question max sum differs from quiz max, scale proportionally
-    const rawTotalMarks = sumPointsEarned;
-    const scaledTotalMarks = sumMaxPoints > 0
-      ? Math.round(((rawTotalMarks / sumMaxPoints) * quizTotalMax) * 100) / 100
-      : 0;
+    // ✅ FIX: Calculate total marks correctly - Number of questions × 10
+    const quizTotalMax = quiz.questions.length * 10;
+    
+    // Use the raw points earned (no scaling needed)
+    const scaledTotalMarks = sumPointsEarned;
     const percentageScore = quizTotalMax > 0
       ? Math.round(((scaledTotalMarks / quizTotalMax) * 100) * 100) / 100
       : 0;
     
-    console.log('\n=== 🎯 QUIZ SCORING SUMMARY ===');
-    console.log('Raw Points Earned:', sumPointsEarned);
-    console.log('Sum of Max Points:', sumMaxPoints);
-    console.log('Quiz Total Max:', quizTotalMax);
-    console.log('Scaled Total Marks:', scaledTotalMarks);
+    console.log('\n=== 🎯 QUIZ SCORING SUMMARY (FIXED) ===');
+    console.log('Points Earned:', sumPointsEarned);
+    console.log('Questions Count:', quiz.questions.length);
+    console.log('Quiz Total Max (Questions × 10):', quizTotalMax);
     console.log('Final Display:', `${scaledTotalMarks} / ${quizTotalMax}`);
     console.log('Percentage:', percentageScore + '%');
     console.log('=== PROCESSED ANSWERS ===');
