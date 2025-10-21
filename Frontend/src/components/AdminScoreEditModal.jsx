@@ -309,6 +309,15 @@ const AdminScoreEditModal = ({
             <h4 className="font-semibold text-lg text-gray-800">Questions & Answers:</h4>
             {score.answers.map((answer, index) => (
               <div key={index} className="border-2 border-gray-200 rounded-lg p-5 bg-gray-50 hover:bg-gray-100 transition-colors">
+                {/* Debug: Log answer data and role */}
+                {console.log(`Answer ${index}:`, { 
+                  isCollegeAdmin: isCollegeAdmin,
+                  hasOptions: !!(answer.options && answer.options.length > 0),
+                  optionsCount: answer.options?.length || 0,
+                  hasRanking: !!(answer.selectedRanking && answer.selectedRanking.length > 0),
+                  topChoice: answer.selectedRanking?.[0]?.text
+                })}
+                
                 <div className="mb-3 flex justify-between items-start">
                   <p className="font-bold text-gray-800 text-lg">Q{index + 1}: {answer.questionText}</p>
                   <div className="text-right">
@@ -319,69 +328,112 @@ const AdminScoreEditModal = ({
                 </div>
 
                 {/* Ranking Answer */}
-                {answer.selectedRanking && answer.selectedRanking.length > 0 && (
+                {((answer.selectedRanking && answer.selectedRanking.length > 0) || (answer.options && answer.options.length > 0)) && (
                   <div className="mb-3">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Student's Ranking:</p>
-                    <div className="space-y-1">
-                      {answer.selectedRanking.map((option, idx) => (
-                        <div key={idx} className="flex items-center text-sm bg-blue-50 p-2 rounded">
-                          <span className="font-semibold mr-2 text-blue-600">{option.rank}.</span>
-                          <span>{option.text}</span>
+                    {answer.selectedRanking && answer.selectedRanking.length > 0 && (
+                      <>
+                        <p className="text-sm font-medium text-gray-700 mb-2">Student's Ranking:</p>
+                        <div className="space-y-1">
+                          {answer.selectedRanking.map((option, idx) => (
+                            <div key={idx} className="flex items-center text-sm bg-blue-50 p-2 rounded">
+                              <span className="font-semibold mr-2 text-blue-600">{option.rank}.</span>
+                              <span>{option.text}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </>
+                    )}
                     
-                    {/* Option Marks Breakdown */}
-                    {answer.options && answer.options.length > 0 && (
-                      <div className="mt-3 p-3 bg-green-50 border-2 border-green-300 rounded-lg">
-                        <p className="text-xs font-bold text-green-700 mb-2 flex items-center">
-                          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    {/* Option Marks Breakdown - Different display for College Admin vs Admin */}
+                    {answer.options && answer.options.length > 0 ? (
+                      <div className="mt-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg shadow-sm">
+                        <p className="text-sm font-bold text-green-800 mb-3 flex items-center">
+                          <svg className="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
                             <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd"/>
                           </svg>
-                          Marks Breakdown (Top Choice Scored):
+                          {isCollegeAdmin 
+                            ? "📊 Student's Selected Option & Marks:" 
+                            : "📊 Super Admin's Marks Breakdown (All Options):"}
                         </p>
-                        <div className="space-y-1">
-                          {answer.options.map((opt, optIdx) => {
-                            const isTopChoice = answer.selectedRanking[0]?.text === opt.text;
+                        <div className="space-y-2">
+                          {answer.options
+                            .filter((opt) => {
+                              // For College Admin: Show only the top choice
+                              // For Admin/Super Admin: Show all options
+                              console.log('Filtering options - isCollegeAdmin:', isCollegeAdmin);
+                              if (isCollegeAdmin === true) {
+                                const topChoiceText = answer.selectedRanking?.[0]?.text;
+                                const shouldShow = opt.text === topChoiceText;
+                                console.log(`Option "${opt.text}" - TopChoice: "${topChoiceText}" - Show: ${shouldShow}`);
+                                return shouldShow;
+                              }
+                              return true; // Admin sees all options
+                            })
+                            .map((opt, optIdx) => {
+                            const isTopChoice = answer.selectedRanking && answer.selectedRanking[0]?.text === opt.text;
+                            const optionMarks = opt.points || opt.marks || 0;
                             return (
                               <div 
                                 key={optIdx} 
-                                className={`flex justify-between items-center text-xs p-2 rounded ${
+                                className={`flex justify-between items-center text-sm p-3 rounded-lg transition-all ${
                                   isTopChoice 
-                                    ? 'bg-green-200 border-2 border-green-500 font-bold' 
-                                    : 'bg-white border border-gray-300'
+                                    ? 'bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-600 font-bold shadow-md transform scale-105' 
+                                    : 'bg-white border border-gray-300 opacity-75'
                                 }`}
                               >
-                                <span className="flex items-center">
+                                <span className="flex items-center flex-1">
                                   {isTopChoice && (
-                                    <svg className="w-4 h-4 mr-1 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg className="w-5 h-5 mr-2 text-green-600 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
                                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                                     </svg>
                                   )}
-                                  <span className={isTopChoice ? 'text-green-800' : 'text-gray-600'}>
+                                  <span className={`${isTopChoice ? 'text-green-900 text-base' : 'text-gray-600'}`}>
                                     {opt.text}
                                   </span>
                                 </span>
-                                <span className={`font-semibold ${isTopChoice ? 'text-green-700' : 'text-gray-500'}`}>
-                                  {isTopChoice ? `${opt.points} marks earned ✓` : `Worth ${opt.maxPoints} marks`}
+                                <span className={`font-bold text-base ml-3 px-3 py-1 rounded ${
+                                  isTopChoice 
+                                    ? 'bg-green-600 text-white' 
+                                    : 'bg-gray-200 text-gray-600'
+                                }`}>
+                                  {isTopChoice 
+                                    ? `✓ ${optionMarks} marks earned` 
+                                    : `${optionMarks} marks`
+                                  }
                                 </span>
                               </div>
                             );
                           })}
                         </div>
-                        <p className="mt-2 text-xs text-green-700 italic">
-                          ✓ Student selected top option and earned <strong>{answer.points || 0} marks</strong> for this question
+                        <div className="mt-3 pt-3 border-t-2 border-green-300 bg-green-100 rounded p-3">
+                          <p className="text-sm text-green-900 font-semibold flex items-center">
+                            <svg className="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                            </svg>
+                            Result: Student {isCollegeAdmin ? 'selected this option and' : 'ranked top choice and'} earned <span className="text-green-700 text-lg ml-1">{answer.points || 0} / 10 marks</span> for this question
+                          </p>
+                          <p className="text-xs text-green-700 mt-1 ml-7">
+                            (Marks set by Super Admin)
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-3 p-3 bg-yellow-50 border border-yellow-300 rounded-lg">
+                        <p className="text-sm text-yellow-800">
+                          ⚠️ Option marks data not available. This may be from an older quiz submission.
                         </p>
                       </div>
                     )}
                     
-                    <p className="mt-2 text-sm">
-                      <span className="font-medium">Ranking Score: </span>
-                      <span className={`font-bold ${answer.rankingScore >= 70 ? 'text-green-600' : 'text-red-600'}`}>
-                        {answer.rankingScore}%
-                      </span>
-                    </p>
+                    {answer.rankingScore !== undefined && (
+                      <p className="mt-2 text-sm">
+                        <span className="font-medium">Ranking Score: </span>
+                        <span className={`font-bold ${answer.rankingScore >= 70 ? 'text-green-600' : 'text-red-600'}`}>
+                          {answer.rankingScore}%
+                        </span>
+                      </p>
+                    )}
                     
                     {/* Show top choice impact */}
                     {answer.selectedOptionImpact && (

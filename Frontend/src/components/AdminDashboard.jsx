@@ -716,6 +716,73 @@ const AdminDashboard = ({ activeTab = 'overview' }) => {
                               ))}
                             </div>
                           </div>
+                          
+                          {/* Option Marks Breakdown - Show only selected option for College Admin */}
+                          {answer.options && answer.options.length > 0 && (
+                            <div className="mt-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg shadow-sm">
+                              <p className="text-sm font-bold text-green-800 mb-3 flex items-center">
+                                <svg className="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                  <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd"/>
+                                </svg>
+                                📊 Student's Selected Option & Marks:
+                              </p>
+                              <div className="space-y-2">
+                                {answer.options
+                                  .filter((opt) => {
+                                    // Show only the student's top choice (selected option)
+                                    const topChoiceText = answer.selectedRanking?.[0]?.text;
+                                    return opt.text === topChoiceText;
+                                  })
+                                  .map((opt, optIdx) => {
+                                  const isTopChoice = answer.selectedRanking && answer.selectedRanking[0]?.text === opt.text;
+                                  const optionMarks = opt.points || opt.marks || 0;
+                                  return (
+                                    <div 
+                                      key={optIdx} 
+                                      className={`flex justify-between items-center text-sm p-3 rounded-lg transition-all ${
+                                        isTopChoice 
+                                          ? 'bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-600 font-bold shadow-md transform scale-105' 
+                                          : 'bg-white border border-gray-300 opacity-75'
+                                      }`}
+                                    >
+                                      <span className="flex items-center flex-1">
+                                        {isTopChoice && (
+                                          <svg className="w-5 h-5 mr-2 text-green-600 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                                          </svg>
+                                        )}
+                                        <span className={`${isTopChoice ? 'text-green-900 text-base' : 'text-gray-600'}`}>
+                                          {opt.text}
+                                        </span>
+                                      </span>
+                                      <span className={`font-bold text-base ml-3 px-3 py-1 rounded ${
+                                        isTopChoice 
+                                          ? 'bg-green-600 text-white' 
+                                          : 'bg-gray-200 text-gray-600'
+                                      }`}>
+                                        {isTopChoice 
+                                          ? `✓ ${optionMarks} marks earned` 
+                                          : `${optionMarks} marks`
+                                        }
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <div className="mt-3 pt-3 border-t-2 border-green-300 bg-green-100 rounded p-3">
+                                <p className="text-sm text-green-900 font-semibold flex items-center">
+                                  <svg className="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                                  </svg>
+                                  Result: Student selected this option and earned <span className="text-green-700 text-lg ml-1">{answer.points || 0} / 10 marks</span> for this question
+                                </p>
+                                <p className="text-xs text-green-700 mt-1 ml-7">
+                                  (Marks set by Super Admin)
+                                </p>
+                              </div>
+                            </div>
+                          )}
                         </>
                       ) : (
                         <div className="mb-3">
