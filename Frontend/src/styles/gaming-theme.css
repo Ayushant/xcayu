@@ -1,0 +1,641 @@
+/* ============================================
+   PREMIUM GAMING UI - STUDENT QUIZ INTERFACE
+   Cyberpunk + Futuristic HUD + AAA Game Aesthetics
+   ============================================ */
+
+/* === CORE COLORS & GRADIENTS === */
+:root {
+  --gaming-bg-primary: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+  --gaming-bg-dark: #0f172a;
+  --gaming-purple: #a855f7;
+  --gaming-cyan: #06b6d4;
+  --gaming-pink: #ec4899;
+  --gaming-gold: #fbbf24;
+  --gaming-neon-blue: #00f0ff;
+  --gaming-neon-pink: #ff00ff;
+}
+
+/* === PREMIUM CARD === */
+.premium-card {
+  background: linear-gradient(135deg, 
+    rgba(30, 40, 70, 0.95), 
+    rgba(15, 25, 50, 0.98)
+  );
+  border: 2px solid rgba(100, 200, 255, 0.3);
+  backdrop-filter: blur(20px);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 40px rgba(0, 240, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.premium-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 240, 255, 0.6);
+  box-shadow: 
+    0 20px 60px rgba(0, 240, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 80px rgba(0, 240, 255, 0.3);
+}
+
+.premium-card:hover::before {
+  opacity: 1;
+}
+
+/* === GAMING BUTTON === */
+.btn-gaming {
+  background: linear-gradient(135deg, #ff00ff 0%, #00f0ff 100%);
+  border: none;
+  border-radius: 0.75rem;
+  padding: 1rem 2rem;
+  font-weight: 800;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 10px 40px rgba(255, 0, 255, 0.4),
+    0 0 20px rgba(0, 240, 255, 0.3);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-gaming::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg, 
+    transparent 30%, 
+    rgba(255, 255, 255, 0.4) 50%, 
+    transparent 70%
+  );
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+.btn-gaming:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 15px 50px rgba(255, 0, 255, 0.6),
+    0 0 40px rgba(0, 240, 255, 0.5);
+}
+
+.btn-gaming:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-gaming:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* === NEON GLOW === */
+.neon-glow {
+  box-shadow: 
+    0 0 20px rgba(0, 240, 255, 0.6),
+    0 0 40px rgba(0, 240, 255, 0.4),
+    inset 0 0 20px rgba(0, 240, 255, 0.1);
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+.neon-glow-active {
+  box-shadow: 
+    0 0 30px rgba(0, 240, 255, 1),
+    0 0 60px rgba(0, 240, 255, 0.6),
+    inset 0 0 30px rgba(0, 240, 255, 0.3);
+  animation: neon-pulse-active 1s ease-in-out infinite;
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.3);
+  }
+}
+
+@keyframes neon-pulse-active {
+  0%, 100% {
+    filter: brightness(1.2);
+  }
+  50% {
+    filter: brightness(1.5);
+  }
+}
+
+/* === NEON BADGE === */
+.neon-badge {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00f0ff 0%, #0080ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.25rem;
+  color: white;
+  box-shadow: 
+    0 0 20px rgba(0, 240, 255, 0.6),
+    inset 0 0 10px rgba(255, 255, 255, 0.3);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.neon-badge::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00f0ff, #0080ff);
+  z-index: -1;
+  filter: blur(10px);
+  opacity: 0.7;
+}
+
+.neon-badge:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 
+    0 0 30px rgba(0, 240, 255, 0.9),
+    inset 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+/* === MISSION BADGE === */
+.mission-badge {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  padding: 1rem 2rem;
+  border-radius: 1rem;
+  box-shadow: 
+    0 10px 30px rgba(139, 92, 246, 0.4),
+    0 0 20px rgba(139, 92, 246, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(139, 92, 246, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.mission-badge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.mission-badge:hover::before {
+  transform: translateX(100%);
+}
+
+/* === STAT CARD === */
+.stat-card {
+  background: linear-gradient(135deg, rgba(30, 40, 70, 0.8), rgba(15, 25, 50, 0.9));
+  border: 2px solid rgba(100, 200, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: -100%;
+  background: conic-gradient(from 180deg, transparent, rgba(0, 240, 255, 0.3), transparent);
+  animation: rotate 4s linear infinite;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: linear-gradient(135deg, rgba(30, 40, 70, 0.9), rgba(15, 25, 50, 0.95));
+  border-radius: 1.125rem;
+  z-index: 0;
+}
+
+.stat-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px) scale(1.05);
+  border-color: rgba(0, 240, 255, 0.6);
+  box-shadow: 0 20px 60px rgba(0, 240, 255, 0.4);
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* === SCORE DISPLAY === */
+.score-display {
+  font-size: 6rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b, #fbbf24);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.6));
+  animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* === SCAN LINE EFFECT === */
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00f0ff, transparent);
+  animation: scan 3s linear infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+/* === GLASS MORPHISM === */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* === PARTICLE BACKGROUND === */
+.particle-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(0, 240, 255, 0.6);
+  border-radius: 50%;
+  animation: float 20s infinite;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(50px);
+    opacity: 0;
+  }
+}
+
+/* === OPTION CARD (for quiz options) === */
+.option-card {
+  background: linear-gradient(135deg, rgba(30, 40, 70, 0.6), rgba(15, 25, 50, 0.8));
+  border: 2px solid rgba(100, 200, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.option-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(255, 0, 255, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.option-card:hover {
+  transform: translateX(8px);
+  border-color: rgba(0, 240, 255, 0.6);
+  box-shadow: 
+    -4px 0 20px rgba(0, 240, 255, 0.3),
+    0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.option-card:hover::before {
+  opacity: 1;
+}
+
+.option-card.selected {
+  border-color: rgba(0, 240, 255, 1);
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(0, 128, 255, 0.2));
+  box-shadow: 
+    -4px 0 30px rgba(0, 240, 255, 0.5),
+    inset 0 0 20px rgba(0, 240, 255, 0.2);
+}
+
+/* === PROGRESS BAR === */
+.progress-bar-container {
+  width: 100%;
+  height: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #06b6d4, #8b5cf6);
+  background-size: 200% 100%;
+  border-radius: 1rem;
+  position: relative;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: progress-shimmer 2s linear infinite;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: progress-shine 1.5s infinite;
+}
+
+@keyframes progress-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes progress-shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* === CELEBRATION PARTICLES === */
+.celebration-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: celebrate 2s ease-out forwards;
+}
+
+@keyframes celebrate {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* === HOLOGRAPHIC EFFECT === */
+.holographic {
+  position: relative;
+  background: linear-gradient(135deg, 
+    rgba(0, 240, 255, 0.1) 0%,
+    rgba(255, 0, 255, 0.1) 50%,
+    rgba(0, 240, 255, 0.1) 100%
+  );
+  background-size: 200% 200%;
+  animation: holographic-shift 5s ease infinite;
+}
+
+@keyframes holographic-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* === LOADING SPINNER === */
+.gaming-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(0, 240, 255, 0.2);
+  border-top-color: #00f0ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* === TEXT EFFECTS === */
+.text-neon {
+  color: #00f0ff;
+  text-shadow: 
+    0 0 10px rgba(0, 240, 255, 0.8),
+    0 0 20px rgba(0, 240, 255, 0.6),
+    0 0 30px rgba(0, 240, 255, 0.4);
+}
+
+.text-gradient-gaming {
+  background: linear-gradient(135deg, #00f0ff, #ff00ff, #00f0ff);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* === HOVER GLOW EFFECT === */
+.hover-glow {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.hover-glow::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #00f0ff, #ff00ff);
+  z-index: -1;
+  opacity: 0;
+  filter: blur(20px);
+  transition: opacity 0.3s;
+}
+
+.hover-glow:hover::after {
+  opacity: 0.8;
+}
+
+/* === RESPONSIVE ADJUSTMENTS === */
+@media (max-width: 768px) {
+  .premium-card {
+    padding: 1.5rem;
+  }
+  
+  .btn-gaming {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .score-display {
+    font-size: 4rem;
+  }
+  
+  .neon-badge {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }
+}
+
+/* === ACCESSIBILITY === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* === DARK MODE ENHANCEMENTS === */
+@media (prefers-color-scheme: dark) {
+  .premium-card {
+    border-color: rgba(100, 200, 255, 0.4);
+  }
+}
+
+/* === FADE IN ANIMATION === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* === SCALE UP ANIMATION === */
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scaleUp {
+  animation: scaleUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* === SLIDE IN FROM BOTTOM === */
+@keyframes slideInBottom {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideInBottom {
+  animation: slideInBottom 0.6s ease-out;
+}
+
