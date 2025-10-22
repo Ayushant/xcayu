@@ -251,6 +251,60 @@ const AdminDashboard = ({ activeTab = 'overview' }) => {
     }
   };
 
+  const handleExportData = () => {
+    try {
+      // Prepare data for export
+      const exportData = quizScores.map((score) => {
+        const submittedDate = score.submittedAt 
+          ? new Date(score.submittedAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+            })
+          : 'N/A';
+        
+        return {
+          'Student Name': score.studentName || score.student?.fullName || 'N/A',
+          'Email': score.studentEmail || score.student?.email || 'N/A',
+          'Quiz': score.quizTitle || score.quiz?.title || 'N/A',
+          'Score': `${Math.round(score.totalScore || 0)} / ${score.quiz?.maxMarks || score.maxMarks || 100}`,
+          'Submitted Date': submittedDate
+        };
+      });
+
+      // Create CSV content
+      const headers = ['Student Name', 'Email', 'Quiz', 'Score', 'Submitted Date'];
+      const csvContent = [
+        headers.join(','),
+        ...exportData.map(row => 
+          headers.map(header => {
+            const value = row[header] || '';
+            // Escape commas and quotes in values
+            return `"${String(value).replace(/"/g, '""')}"`;
+          }).join(',')
+        )
+      ].join('\n');
+
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `quiz_submissions_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success('Data exported successfully');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export data');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -312,7 +366,10 @@ const AdminDashboard = ({ activeTab = 'overview' }) => {
                   </svg>
                   Add Student
                 </button>
-                <button className="bg-white text-gray-700 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 flex items-center">
+                <button 
+                  onClick={handleExportData}
+                  className="bg-white text-gray-700 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 flex items-center"
+                >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                   </svg>
@@ -439,6 +496,7 @@ const AdminDashboard = ({ activeTab = 'overview' }) => {
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quiz</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Final Score</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
@@ -452,6 +510,11 @@ const AdminDashboard = ({ activeTab = 'overview' }) => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {score.quizTitle || score.quiz?.title || 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-bold text-purple-600">
+                          {Math.round(score.totalScore || 0)} / {score.quiz?.maxMarks || score.maxMarks || 100}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {score.submittedAt ? new Date(score.submittedAt).toLocaleDateString() : 'N/A'}

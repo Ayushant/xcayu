@@ -279,7 +279,7 @@ const About = () => {
               {
                 name: "Ayushant Khandekar",
                 img: imageUrls.p3,
-                desc: "Ayushant is an expert in tech development and AI-driven solutions, Founder of Atkind, a Founder Member at TrayaTech Labs, and building FairPlace.in, an AI-driven e-commerce solution for retailers in a Bengaluru-based startup.\n\nHe also serves as a Technical Advisor to a Turkey-based venture and has lead teams at peakprosys.in\n\nHis expertise spans full-stack development, UI/UX design, automation, and AI integration, enabling the creation of scalable digital products that combine creativity with engineering depth.\n\nWith experience across founder, advisor, and leadership roles, he is passionate about harnessing emerging technologies to transform bold ideas into future-ready realities.",
+                desc: "Ayushant is an expert in tech development and AI-driven solutions, Founder of Atkind, a Founder Member at TrayaTech Labs, and building FairPlace.in, an AI-driven e-commerce solution for retailers in a Bengaluru-based startup.\n\nHe also serves as a Technical Advisor to a Turkey-based venture and lead teams at peakprosys pvt ltd(peakprosys.in)\n\nHis expertise spans full-stack development, UI/UX design, automation, and AI integration, enabling the creation of scalable digital products that combine creativity with engineering depth.\n\nWith experience across founder, advisor, and leadership roles, he is passionate about harnessing emerging technologies to transform bold ideas into future-ready realities.",
                 linkedin: "https://www.linkedin.com/in/ayushant"
               }
             ].map((person, idx) => (

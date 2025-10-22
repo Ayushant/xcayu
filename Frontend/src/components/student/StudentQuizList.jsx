@@ -116,16 +116,33 @@ const StudentQuizList = ({ onQuizStateChange }) => {
   };
 
   const handleBackToList = () => {
-    setSelectedQuiz(null);
     setShowPreface(false);
     setShowQuiz(false);
     setShowResults(false);
+    setSelectedQuiz(null);
     setCompletedQuizResult(null);
-    fetchMyScores();
-    
-    // Notify parent that quiz is no longer active (show header)
     if (onQuizStateChange) {
       onQuizStateChange(false);
+    }
+    fetchQuizzes();
+    fetchMyScores();
+  };
+
+  const handleViewCompletedMission = async (score) => {
+    try {
+      // Fetch full score details with answers
+      const response = await api.get(`/scores/${score._id}`);
+      const fullScoreData = response.data.score || response.data.data?.score || response.data;
+      
+      setCompletedQuizResult(fullScoreData);
+      setShowResults(true);
+      
+      if (onQuizStateChange) {
+        onQuizStateChange(true);
+      }
+    } catch (error) {
+      console.error('Error fetching score details:', error);
+      alert('Unable to load mission results. Please try again.');
     }
   };
 
@@ -532,10 +549,52 @@ const StudentQuizList = ({ onQuizStateChange }) => {
                     return (
                       <div
                         key={score._id}
-                        className="premium-card-base hover-lift"
+                        className="premium-card-base"
                         style={{ cursor: 'default' }}
                       >
                         <div className="flex flex-col md:flex-row gap-6">
+                          {/* Score Badge */}
+                          <div className="flex-shrink-0 self-center md:self-start">
+                            <div style={{
+                              width: '140px',
+                              height: '140px',
+                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                              borderRadius: 'var(--radius-lg)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              boxShadow: '0 10px 30px rgba(102, 126, 234, 0.4)',
+                              border: '3px solid rgba(255, 255, 255, 0.2)'
+                            }}>
+                              <div style={{
+                                fontSize: '42px',
+                                fontWeight: 'var(--weight-black)',
+                                color: 'white',
+                                marginBottom: '4px',
+                                lineHeight: '1'
+                              }}>
+                                {Math.round(Number(numerator || 0))}
+                              </div>
+                              <div style={{
+                                fontSize: '14px',
+                                color: 'rgba(255, 255, 255, 0.9)',
+                                fontWeight: 'var(--weight-bold)',
+                                marginBottom: '2px'
+                              }}>
+                                out of
+                              </div>
+                              <div style={{
+                                fontSize: '28px',
+                                fontWeight: 'var(--weight-black)',
+                                color: 'white',
+                                lineHeight: '1'
+                              }}>
+                                {derivedMaxMarks}
+                              </div>
+                            </div>
+                          </div>
+
                           {/* Mission Details */}
                           <div className="flex-1">
                             <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-6">
